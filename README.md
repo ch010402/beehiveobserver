@@ -1,2 +1,2 @@
 # beehiveobserver
-Observe Temp and Pos (in case of theft) of my hives. Eventually weight comes too
+This script is meant to observe the temperature of my bee hives also the postion will be monitored as in case of theft i know where it goes. The Data will be transmitted with an Arduino MKR WAN to the things network - node red - influxdb to grafana.
