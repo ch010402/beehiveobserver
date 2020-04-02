@@ -66,7 +66,7 @@ bool enable_gps = true;
 
 //// TTN Mapper
 unsigned long last_update = 0;
-uint8_t txBuffer[11];
+uint8_t txBuffer[12];
 uint32_t latitudeBinary, longitudeBinary;
 uint16_t altitudeGps;
 uint8_t satsGps;
@@ -170,22 +170,24 @@ void buildPacket() {
   int shortlon = pos[1] / 100;
   int alt_m = pos[2] / 100;
   int temp = ( temperatur + 50 ) * 10;
+  //device ID
+  txBuffer[0] = device[0];
   // latitude
-  txBuffer[0] = ( shortlat >> 16 ) & 0xFF;
-  txBuffer[1] = ( shortlat >> 8 ) & 0xFF;
-  txBuffer[2] = shortlat & 0xFF;
+  txBuffer[1] = ( shortlat >> 16 ) & 0xFF;
+  txBuffer[2] = ( shortlat >> 8 ) & 0xFF;
+  txBuffer[3] = shortlat & 0xFF;
   // longitude
-  txBuffer[3] = ( shortlon >> 16 ) & 0xFF;
-  txBuffer[4] = ( shortlon >> 8 ) & 0xFF;
-  txBuffer[5] = shortlon & 0xFF;
+  txBuffer[4] = ( shortlon >> 16 ) & 0xFF;
+  txBuffer[5] = ( shortlon >> 8 ) & 0xFF;
+  txBuffer[6] = shortlon & 0xFF;
   // altitude
-  txBuffer[6] = ( alt_m >> 8 ) & 0xFF;
-  txBuffer[7] =  alt_m & 0xFF;
+  txBuffer[7] = ( alt_m >> 8 ) & 0xFF;
+  txBuffer[8] =  alt_m & 0xFF;
   // satellites
-  txBuffer[8] = pos[3] & 0xFF;
+  txBuffer[9] = pos[3] & 0xFF;
   // temperatur
-  txBuffer[9] = (temp >> 8 ) & 0xFF;
-  txBuffer[10] = temp & 0xFF;
+  txBuffer[10] = (temp >> 8 ) & 0xFF;
+  txBuffer[11] = temp & 0xFF;
 }
 
 void gettemp() {
@@ -222,15 +224,15 @@ void setup() {
   flash(2, FAST);
 
   int connected = modem.joinOTAA(appEui, appKey);
-  if (!connected) {
+  while (!connected) {
     // retry
     flash(10, VERY_FAST);
     debugSerial.println(F("Retry connection"));
     connected = modem.joinOTAA(appEui, appKey);
-    if (!connected) {
+    /*if (!connected) {
       debugSerial.println(F("Something went wrong; are you indoor? Move near a window and retry"));
       flash(FOREVER, VERY_FAST);
-    }
+    }*/
   }
   debugSerial.println(F("Successfully joined the network!"));
   flash(2, FAST);
@@ -293,5 +295,5 @@ void loop() {
     gpssleep(); 
   }
   
-  delay(1000 * 60 * 3);
+  delay(1000 * 60 * 10);
 }
