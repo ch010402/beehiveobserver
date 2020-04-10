@@ -99,15 +99,15 @@ void flash(int times, unsigned int speed) {
 
 // get the GPS position
 void gpspos(int gpswait) {
+  // wake up GPS
+  debugSerial.println(F("Wake GPS from sleep..."));
+  sendUBX(GPSup, sizeof(GPSup)/sizeof(uint8_t));
   // set exit Variable false 
   bool exit = false;
   // clear array
-  for ( int i = 0; i < sizeof(pos); i++ ) {
-    pos[i] = 0;
+  for ( int i = 0; i < posarraysize; i++ ) {
+    pos[i] = 22;
   }
-  // wake up GPS
-  debugSerial.println(F("Wake GPS up from sleep..."));
-  sendUBX(GPSup, sizeof(GPSup)/sizeof(uint8_t));
   // give GPS time [sec] to aquire satellites almanach and eph
   delay(1000 * gpswait);
   flash(2, FAST);
@@ -124,8 +124,6 @@ void gpspos(int gpswait) {
       }
     }
   }
-  debugSerial.println(F("Send GPS to sleep..."));
-  sendUBX(GPSdown, sizeof(GPSdown)/sizeof(uint8_t));
 }
 
 // send a byte array of UBX protocol to the GPS
@@ -134,6 +132,12 @@ void sendUBX(uint8_t *MSG, uint8_t len) {
     gpsSerial.write(MSG[i]);
   }
   flash(1, SLOW);
+}
+
+// set the GPS in sleep mode
+void gpssleep() {
+  debugSerial.println(F("Send GPS to sleep..."));
+  sendUBX(GPSdown, sizeof(GPSdown)/sizeof(uint8_t));
 }
 
 // send a package over LoRa
@@ -285,6 +289,10 @@ void loop() {
      debugSerial.print(" ");
   }
   debugSerial.print("\n");
+
+  if (enable_gps) {
+    gpssleep(); 
+  }
   
   delay(1000 * 60 * 10);
 }
