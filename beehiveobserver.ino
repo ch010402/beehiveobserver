@@ -81,10 +81,9 @@ int count = 10;
 
 // DS18B20
 DS18B20 ds(7);
-//uint8_t address[] = { 0x28, 0xF0, 0x22, 0x3A, 0x2D, 0x19, 0x01, 0xC0  };
 uint8_t selected;
 bool enable_temp = true;
-int temperatur = 123;
+float temperatur = 123;
 
 
 //=====functions=====================
